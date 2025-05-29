@@ -26,44 +26,64 @@
 // * wrap 'CourseForm' in the 'PrivateRoute' component
 // * get authorized user info by 'user/me' GET request if 'localStorage' contains token
 
-import React, { useState } from "react";
+import React, { useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import styles from "./App.module.css";
-import { Header } from "./components/Header/Header";
-import { Courses } from "./components/Courses/Courses";
-import { CourseInfo } from "./components/CourseInfo/CourseInfo";
-import { mockedCoursesList, mockedAuthorsList } from "./constants";
+import {
+  Header,
+  Registration,
+  Login,
+  Courses,
+  CourseInfo,
+  CourseForm,
+} from "./components";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUserToken } from "./store/selectors";
+import { getCourses, getAuthors } from "./services";
+import { setCourses } from "./store/slices/coursesSlice";
+import { setAuthors } from "./store/slices/authorsSlice";
 
 function App() {
-  const [showCourseId, setShowCourseId] = useState(null);
+  const dispatch = useDispatch();
+  const token = useSelector(selectUserToken);
 
-  const handleShowCourse = (courseId) => {
-    setShowCourseId(courseId);
-  };
+  useEffect(() => {
+    if (token && process.env.NODE_ENV !== "test") {
+      const fetchData = async () => {
+        try {
+          const courses = await getCourses();
+          const authors = await getAuthors();
+          dispatch(setCourses(courses.result));
+          dispatch(setAuthors(authors.result));
+        } catch (error) {
+          console.error("Ошибка при загрузке курсов или авторов:", error);
+        }
+      };
 
-  const handleBackToCourses = () => {
-    setShowCourseId(null);
-  };
+      fetchData();
+    }
+  }, [token, dispatch]);
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.app}>
       <Header />
-      <div className={styles.container}>
-        {showCourseId ? (
-          <CourseInfo
-            coursesList={mockedCoursesList}
-            authorsList={mockedAuthorsList}
-            showCourseId={showCourseId}
-            onBack={handleBackToCourses}
-          />
+      <Routes>
+        {!token ? (
+          <>
+            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/registration" element={<Registration />} />
+            <Route path="*" element={<Navigate to="/login" />} />
+          </>
         ) : (
-          <Courses
-            coursesList={mockedCoursesList}
-            authorsList={mockedAuthorsList}
-            handleShowCourse={handleShowCourse}
-            onAddCourse={() => console.log("Add new course clicked")}
-          />
+          <>
+            <Route path="/" element={<Courses />} />
+            <Route path="/courses/add" element={<CourseForm />} />
+            <Route path="/courses/:courseId" element={<CourseInfo />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </>
         )}
-      </div>
+      </Routes>
     </div>
   );
 }

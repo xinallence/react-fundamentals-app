@@ -9,15 +9,23 @@ export const Input = ({
   placeholderText,
   labelText,
   onChange,
+  value,
+  name,
+  type = "text",
+  id,
   "data-testid": dataTestId,
 }) => (
-  <label className={styles.label}>
+  <label className={styles.label} htmlFor={id || name}>
     {labelText}
     <input
+      id={id || name}
+      name={name}
+      type={type}
+      value={value}
       onChange={onChange}
+      data-testid={dataTestId}
       placeholder={placeholderText}
       className={styles.input}
-      data-testid={dataTestId}
     />
   </label>
 );

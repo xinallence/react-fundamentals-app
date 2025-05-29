@@ -29,44 +29,41 @@
 //   ** CourseForm should be shown after a click on the "Add new course" button.
 
 import React from "react";
-import { Button } from "../../common";
-import { CourseCard } from "./components/CourseCard/CourseCard";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { Button } from "../../common/Button/Button";
+import { CourseCard } from "./components";
 import styles from "./styles.module.css";
 
-export const Courses = ({
-  coursesList,
-  authorsList,
-  onAddClick,
-  handleShowCourse,
-}) => {
-  if (coursesList.length === 0) {
-    return <EmptyCourseList />;
-  } else {
+export const Courses = () => {
+  const courses = useSelector((state) => state.courses);
+  const user = useSelector((state) => state.user);
+
+  if (!courses || courses.length === 0) {
     return (
-      <>
-        <div key="add-new-course" className={styles.panel}>
-          <Button buttonText="ADD NEW COURSE" data-testid="addCourse" />
-        </div>
-        {Object.entries(coursesList).map(([_, course]) => (
-          <CourseCard
-            key={course.id}
-            course={course}
-            authorsList={authorsList}
-            handleShowCourse={handleShowCourse}
-          />
-        ))}
-      </>
+      <div className={styles.emptyContainer}>
+        <h2>Your List Is Empty</h2>
+        <Link to="/courses/add" className={styles.noUnderline}>
+          <Button buttonText="Add new course" data-testid="addCourse" />
+        </Link>
+      </div>
     );
   }
-};
 
-export const EmptyCourseList = () => {
   return (
-    <div className={styles.empty} data-testid="emptyContainer">
-      <h2>Your List Is Empty</h2>
-      <p>Please use "add new course" button to add your first course</p>
-      <div className={styles.buttonContainer}>
-        <Button buttonText="ADD NEW COURSE" data-testid="addCourse" />
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1>Courses</h1>
+        {user?.isAuth && (
+          <Link to="/courses/add" className={styles.noUnderline}>
+            <Button buttonText="Add new course" data-testid="addCourse" />
+          </Link>
+        )}
+      </div>
+      <div className={styles.courseList}>
+        {courses.map((course) => (
+          <CourseCard key={course.id} course={course} />
+        ))}
       </div>
     </div>
   );
