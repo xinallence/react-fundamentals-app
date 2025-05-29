@@ -9,8 +9,6 @@
 // // Module 3.
 // // Remove 'onCreateAuthor' from props => use 'dispatch' and 'saveAuthor' from 'authorsSlice.js' to save new author to the store
 
-
-
 // import React from "react";
 // import styles from "./styles.module.css";
 

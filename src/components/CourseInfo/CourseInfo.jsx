@@ -23,52 +23,49 @@
 // * use selectors from store/selectors.js to get coursesList, authorsList from store
 
 import React from "react";
-
 import { formatCreationDate, getCourseDuration } from "../../helpers";
-
+import { Button } from "../../common/Button/Button";
 import styles from "./styles.module.css";
 
-// props description
-// * 'coursesList' - list of all courses. You need it to get chosen course from the list
-// * 'authorsList' - list of all authors. You need it to get authors' names for chosen course
-// * 'showCourseId' - id of chosen course. Use it to find needed course on the 'coursesList'.
 export const CourseInfo = ({
   coursesList,
   authorsList,
   onBack,
   showCourseId,
 }) => {
-  // write your code here
+  const course = coursesList.find((course) => course.id === showCourseId);
 
   return (
     <div className={styles.container} data-testid="courseInfo">
-      <h1>Course title</h1>
+      <h1>{course.title}</h1>
       <div className={styles.courseInfo}>
-        <p className={styles.description}>Course description</p>
+        <p className={styles.description}>{course.description}</p>
         <div>
           <p>
             <b>ID: </b>
-            id
+            {course.id}
           </p>
           <p>
             <b>Duration: </b>
-            duration (use getCourseDuration)
+            {getCourseDuration(course.duration)}
           </p>
           <p>
             <b>Created: </b>
-            creation date (use formatCreationDate)
+            {formatCreationDate(course.creationDate)}
           </p>
           <div>
             <b>Authors</b>
             <ul className={styles.authorsList}>
-              //use '.map' to render authors list with 'li' tag
+              {course.authors.map((id) => (
+                <li key={id}>
+                  {authorsList.find((author) => author.id === id)?.name}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
       </div>
-      // Module 1: reuse Button component for 'onBack' functionality // Module
-      2: use 'react-router-dom' 'Link' component for button 'Back' and remove
-      'onBack' prop
+      <Button buttonText="BACK" handleClick={onBack} />
     </div>
   );
 };

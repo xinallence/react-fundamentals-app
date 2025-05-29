@@ -14,7 +14,7 @@
 // // ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-2/home-task/components#add-new-course
 
 // // Module 3.
-// // * remove props - authorsList, createCourse, createAuthor 
+// // * remove props - authorsList, createCourse, createAuthor
 // // * use selector from store/selectors.js to get authorsList from store
 // // * save new course to the store. Use action 'saveCourse' from 'src/store/slices/coursesSlice'
 // // * save new author to the store. Use action 'saveAuthor' from 'src/store/slices/authorsSlice'

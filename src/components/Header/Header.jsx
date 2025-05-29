@@ -1,7 +1,3 @@
-import React from "react";
-
-import styles from "./styles.module.css";
-
 // Module 1:
 // * add Logo and Button components
 // * add Header component to the App component
@@ -31,15 +27,18 @@ import styles from "./styles.module.css";
 // *proposed cases for unit tests:
 //   ** Header should have logo and user's name.
 
-export const Header = () => {
-  // write your code here
+import React from "react";
+import { Logo } from "./components";
+import { Button } from "../../common";
 
+import styles from "./styles.module.css";
+export const Header = () => {
   return (
     <div className={styles.headerContainer}>
-      // use Logo component
+      <Logo />
       <div className={styles.userContainer}>
         <p className={styles.userName}>Harry Potter</p>
-        // reuse Button component for 'Login / Logout' button
+        <Button buttonText="LOGOUT" />
       </div>
     </div>
   );

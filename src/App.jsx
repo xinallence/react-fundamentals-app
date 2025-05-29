@@ -1,6 +1,3 @@
-import React from "react";
-import styles from "./App.module.css";
-
 // Module 1:
 // * use mockedAuthorsList and mockedCoursesList mocked data
 // * add next components to the App component: Header, Courses and CourseInfo
@@ -10,7 +7,7 @@ import styles from "./App.module.css";
 // Module 2:
 // * use mockedAuthorsList and mockedCoursesList mocked data
 // * remove useState for selected courseId
-// * use hook useState for storing list of courses and authors 
+// * use hook useState for storing list of courses and authors
 // * import Routes and Route from 'react-router-dom'
 // * Add Routes to the container div (do not include Header to the Routes since header will not be changed with pages)
 // ** TASK DESCRIPTION ** - https://react-fundamentals-tasks.vercel.app/docs/module-2/home-task/components#add-the-router-to-the-app-component
@@ -29,13 +26,44 @@ import styles from "./App.module.css";
 // * wrap 'CourseForm' in the 'PrivateRoute' component
 // * get authorized user info by 'user/me' GET request if 'localStorage' contains token
 
+import React, { useState } from "react";
+import styles from "./App.module.css";
+import { Header } from "./components/Header/Header";
+import { Courses } from "./components/Courses/Courses";
+import { CourseInfo } from "./components/CourseInfo/CourseInfo";
+import { mockedCoursesList, mockedAuthorsList } from "./constants";
+
 function App() {
-  // write your code here
+  const [showCourseId, setShowCourseId] = useState(null);
+
+  const handleShowCourse = (courseId) => {
+    setShowCourseId(courseId);
+  };
+
+  const handleBackToCourses = () => {
+    setShowCourseId(null);
+  };
 
   return (
     <div className={styles.wrapper}>
-      {/* place Header component */}
-      <div className={styles.container}>{/* place other components */}</div>
+      <Header />
+      <div className={styles.container}>
+        {showCourseId ? (
+          <CourseInfo
+            coursesList={mockedCoursesList}
+            authorsList={mockedAuthorsList}
+            showCourseId={showCourseId}
+            onBack={handleBackToCourses}
+          />
+        ) : (
+          <Courses
+            coursesList={mockedCoursesList}
+            authorsList={mockedAuthorsList}
+            handleShowCourse={handleShowCourse}
+            onAddCourse={() => console.log("Add new course clicked")}
+          />
+        )}
+      </div>
     </div>
   );
 }
