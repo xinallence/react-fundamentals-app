@@ -36,19 +36,12 @@
 //   ** CourseCard should display created date in the correct format.
 
 import React from "react";
+import { Link } from "react-router-dom";
 import { getCourseDuration, formatCreationDate } from "../../../../helpers";
-import deleteIcon from "../../../../assets/deleteButtonIcon.svg";
-import editIcon from "../../../../assets/editButtonIcon.svg";
-import { Button } from "../../../../common/Button/Button";
 import styles from "./styles.module.css";
+import { Button } from "../../../../common";
 
-export const CourseCard = ({
-  course,
-  handleShowCourse,
-  authorsList,
-  onEditCourse,
-  onDeleteCourse,
-}) => {
+export const CourseCard = ({ course, authorsList }) => {
   return (
     <div className={styles.cardContainer} data-testid="courseCard">
       <div className={styles.cardText}>
@@ -73,25 +66,9 @@ export const CourseCard = ({
           <span>{formatCreationDate(course.creationDate)}</span>
         </p>
         <div className={styles.buttonsContainer}>
-          <Button
-            buttonText="SHOW COURSE"
-            handleClick={() => handleShowCourse(course.id)}
-          />
-          <Button
-            buttonText={
-              <img src={editIcon} alt="Edit" className={styles.icon} />
-            }
-            handleClick={() => onEditCourse(course.id)}
-            type="button"
-          />
-
-          <Button
-            buttonText={
-              <img src={deleteIcon} alt="Delete" className={styles.icon} />
-            }
-            handleClick={() => onDeleteCourse(course.id)}
-            type="button"
-          />
+          <Link to={`/courses/${course.id}`} className={styles.noUnderline}>
+            <Button buttonText="SHOW COURSE" />
+          </Link>
         </div>
       </div>
     </div>

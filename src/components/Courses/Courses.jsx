@@ -28,30 +28,51 @@
 //   ** Courses should display amount of CourseCard equal length of courses array.
 //   ** CourseForm should be shown after a click on the "Add new course" button.
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import CourseCard from './components/CourseCard';
-import styles from './styles.module.css';
+import React, { useEffect } from "react";
+import styles from "./styles.module.css";
+import { Button } from "../../common";
+import { CourseCard } from "./components";
+import { Link, useNavigate } from "react-router-dom";
 
-import { mockedCoursesList } from '../../constants';
+export const Courses = ({ coursesList, authorsList }) => {
+  const navigate = useNavigate();
 
-const Courses = () => {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  if (coursesList.length === 0) {
+    return <EmptyCourseList />;
+  }
+
   return (
-    <div className={styles.courses}>
-      <div className={styles.header}>
-        <h2>Courses</h2>
-        <Link to="/courses/add" className={styles.addButton}>
-          Add New Course
+    <>
+      <div className={styles.panel}>
+        <Link to="/courses/add" className={styles.noUnderline}>
+          <Button buttonText="ADD NEW COURSE" data-testid="addCourse" />
         </Link>
       </div>
-      <div className={styles.list}>
-        {mockedCoursesList.map((course) => (
-          <CourseCard key={course.id} course={course} />
-        ))}
+
+      {coursesList.map((course) => (
+        <CourseCard key={course.id} course={course} authorsList={authorsList} />
+      ))}
+    </>
+  );
+};
+
+const EmptyCourseList = () => {
+  return (
+    <div className={styles.empty} data-testid="emptyContainer">
+      <h2>Your List Is Empty</h2>
+      <p>Please use "add new course" button to add your first course</p>
+      <div className={styles.buttonContainer}>
+        <Link to="/courses/add" className={styles.noUnderline}>
+          <Button buttonText="ADD NEW COURSE" data-testid="addCourse" />
+        </Link>
       </div>
     </div>
   );
 };
-
-export default Courses;
-

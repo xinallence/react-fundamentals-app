@@ -1,87 +1,89 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import Input from '../../common/Input';
-import Button from '../../common/Button';
-import styles from './styles.module.css';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import styles from "./styles.module.css";
+import { Input } from "../../common/Input/Input";
+import { Button } from "../../common/Button/Button";
+import { login } from "../../services";
 
-const Login = () => {
+export const Login = ({ setToken, setUserName }) => {
   const navigate = useNavigate();
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const [errors, setErrors] = useState({ email: '', password: '' });
-  const [apiError, setApiError] = useState('');
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({});
 
   const validate = () => {
     const newErrors = {};
-    if (!email.trim()) newErrors.email = 'Email is required';
-    if (!password.trim()) newErrors.password = 'Password is required';
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.password.trim()) newErrors.password = "Password is required";
     return newErrors;
   };
-  
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setApiError('');
-
-    const newErrors = validate();
-    if (Object.keys(newErrors).length) {
-      setErrors(newErrors);
-      return;
-    }
+    const validationErrors = validate();
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
 
     try {
-      const response = await fetch('http://localhost:4000/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const result = await response.json();
+      const data = await login(formData);
 
-      if (!response.ok) {
-        setApiError(result?.errors?.[0]?.msg || 'Login failed');
-        return;
-      }
-
-      localStorage.setItem('token', result.result);
-      navigate('/courses');
-    } catch (error) {
-      setApiError(error.message);
+      localStorage.setItem("token", data.result);
+      localStorage.setItem("userName", data.user.name);
+      setToken(data.result);
+      setUserName(data.user.name);
+      navigate("/courses");
+    } catch (err) {
+      alert(err.message || "Something went wrong");
     }
   };
-  
+
   return (
-    <div className={styles.login}>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <Input
-          labelText="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        {errors.email && <div className={styles.error}>{errors.email}</div>}
+    <div className={styles.container}>
+      <h1>Login</h1>
+      <div className={styles.formContainer}>
+        <form onSubmit={handleSubmit} data-testid="loginForm">
+          <Input
+            labelText="Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Enter your email"
+            data-testid="emailInput"
+          />
+          {errors.email && (
+            <div className={styles.error} data-testid="emailError">
+              {errors.email}
+            </div>
+          )}
 
-        <Input
-          labelText="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {errors.password && (
-          <div className={styles.error}>{errors.password}</div>
-        )}
+          <Input
+            labelText="Password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter password"
+            data-testid="passwordInput"
+          />
+          {errors.password && (
+            <div className={styles.error} data-testid="passwordError">
+              {errors.password}
+            </div>
+          )}
 
-        {apiError && <div className={styles.error}>{apiError}</div>}
+          <Button buttonText="Login" type="submit" data-testid="loginButton" />
+        </form>
 
-        <Button text="Login" />
-      </form>
-      <div className={styles.link}>
-        Don't have an account? <Link to="/registration">Register</Link>
+        <p>
+          <span>If you don't have an account you </span>
+          <Link to="/registration" data-testid="registrationLink">
+            Registration
+          </Link>
+        </p>
       </div>
     </div>
   );
 };
-
-export default Login;
-

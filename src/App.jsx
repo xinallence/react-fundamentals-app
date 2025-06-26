@@ -26,43 +26,116 @@
 // * wrap 'CourseForm' in the 'PrivateRoute' component
 // * get authorized user info by 'user/me' GET request if 'localStorage' contains token
 
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Registration from './components/Registration';
-import Login from './components/Login';
-import Courses from './components/Courses';
-import CourseForm from './components/CourseForm';
-import CourseInfo from './components/CourseInfo';
-import Header from './components/Header';
+import React, { useEffect, useState } from "react";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import styles from "./App.module.css";
+import { Header } from "./components/Header/Header";
+import { Registration } from "./components/Registration/Registration";
+import { Login } from "./components/Login/Login";
+import { Courses } from "./components/Courses/Courses";
+import { CourseInfo } from "./components/CourseInfo/CourseInfo";
+import { CourseForm } from "./components/CourseForm/CourseForm";
+import { mockedAuthorsList, mockedCoursesList } from "./constants";
 
-const App = () => {
-  const token = localStorage.getItem('token');
+function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [userName, setUserName] = useState(localStorage.getItem("userName"));
+  const [courses, setCourses] = useState(mockedCoursesList);
+  const [authors, setAuthors] = useState(mockedAuthorsList);
+
+  useEffect(() => {
+    const tokenFromStorage = localStorage.getItem("token");
+    const userNameFromStorage = localStorage.getItem("userName");
+
+    setToken(tokenFromStorage);
+    setUserName(userNameFromStorage);
+
+    if (location.pathname === "/" || location.pathname === "") {
+      navigate(tokenFromStorage ? "/courses" : "/login", { replace: true });
+    }
+  }, [location.pathname, navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    setToken(null);
+    setUserName(null);
+    navigate("/login");
+  };
+
+  const handleCreateCourse = (newCourse) => {
+    setCourses((prev) => [...prev, newCourse]);
+  };
+
+  const handleCreateAuthor = (newAuthor) => {
+    setAuthors((prev) => [...prev, newAuthor]);
+  };
+
+  const isAuthPage =
+    location.pathname === "/login" || location.pathname === "/registration";
 
   return (
-    <div>
-      <Header />
-      <Routes>
-        <Route path="/registration" element={<Registration />} />
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/courses"
-          element={token ? <Courses /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/courses/add"
-          element={token ? <CourseForm /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/courses/:courseId"
-          element={token ? <CourseInfo /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="*"
-          element={token ? <Navigate to="/courses" /> : <Navigate to="/login" />}
-        />
-      </Routes>
+    <div className={styles.wrapper}>
+      {!isAuthPage && token && (
+        <Header userName={userName} onLogout={handleLogout} />
+      )}
+      <div className={styles.container}>
+        <Routes>
+          <Route
+            path="/login"
+            element={<Login setToken={setToken} setUserName={setUserName} />}
+          />
+          <Route path="/registration" element={<Registration />} />
+          <Route
+            path="/courses"
+            element={
+              token ? (
+                <Courses coursesList={courses} authorsList={authors} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/courses/:courseId"
+            element={
+              token ? (
+                <CourseInfo coursesList={courses} authorsList={authors} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/courses/add"
+            element={
+              token ? (
+                <CourseForm
+                  authorsList={authors}
+                  createCourse={handleCreateCourse}
+                  createAuthor={handleCreateAuthor}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="*"
+            element={<Navigate to={token ? "/courses" : "/login"} />}
+          />
+        </Routes>
+      </div>
     </div>
   );
-};
+}
 
 export default App;

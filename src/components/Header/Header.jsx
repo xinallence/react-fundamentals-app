@@ -1,37 +1,35 @@
-import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import styles from './styles.module.css';
-import Button from '../../common/Button';
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Logo } from "./components";
+import { Button } from "../../common";
 
-const Header = () => {
+import styles from "./styles.module.css";
+
+export const Header = () => {
+  const token = localStorage.getItem("token");
   const location = useLocation();
   const navigate = useNavigate();
 
-  const token = localStorage.getItem('token');
-  const userName = localStorage.getItem('userName');
-
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/registration';
+  const isAuthPage = ["/login", "/registration"].includes(location.pathname);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userName');
-    navigate('/login');
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
-  if (isAuthPage) return null;
-
   return (
-    <header className={styles.header}>
-      <div className={styles.logo}>MyApp</div>
-      {token && (
-        <div className={styles.userBlock}>
-          <span className={styles.username}>{userName}</span>
-          <Button text="Logout" onClick={handleLogout} />
+    <div className={styles.headerContainer}>
+      <Logo />
+      {token && !isAuthPage && (
+        <div className={styles.userContainer}>
+          <p className={styles.userName}>User</p>
+          <Button
+            buttonText="LOGOUT"
+            handleClick={handleLogout}
+            data-testid="logoutButton"
+          />
         </div>
       )}
-    </header>
+    </div>
   );
 };
-
-export default Header;
-

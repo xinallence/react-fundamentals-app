@@ -22,3 +22,44 @@
 //     </div>
 //   );
 // };
+import React, { useState } from "react";
+import { Input } from "../../../../common/Input/Input";
+import { Button } from "../../../../common/Button/Button";
+import styles from "./styles.module.css";
+
+export const CreateAuthor = ({ onCreateAuthor }) => {
+  const [authorName, setAuthorName] = useState("");
+
+  const handleCreate = () => {
+    if (authorName.trim().length < 2) {
+      alert("Author name must be at least 2 characters");
+      return;
+    }
+
+    const newAuthor = {
+      id: String(Date.now()),
+      name: authorName,
+    };
+
+    onCreateAuthor(newAuthor);
+    setAuthorName("");
+  };
+
+  return (
+    <div className={styles.createAuthor}>
+      <Input
+        labelText="Author Name"
+        name="authorName"
+        value={authorName}
+        onChange={(e) => setAuthorName(e.target.value)}
+        placeholderText="Enter author name"
+        data-testid="createAuthorInput"
+      />
+      <Button
+        buttonText="Create Author"
+        handleClick={handleCreate}
+        data-testid="createAuthorButton"
+      />
+    </div>
+  );
+};
